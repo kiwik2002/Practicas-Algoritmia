@@ -52,34 +52,43 @@ def _path2str(path: list[Vertex]) -> str:
 #   en el formato descrito en el apartado 1.2 del enunciado.
 # - Devuelve la instancia como un objeto de tipo Data.
 def read_data(f: TextIO) -> Data:
+
     calorias_x , calorias_y = (int(s) for s in f.readline().split())
+
     rows , cols = (int(s) for s in f.readline().split())
+
     aristas : list[Edge] = []
+
     #Extraigo las aristas y las convierto
     for line in f:
-        for stru , strv , stra ,strb in line.split():
-            u,v,a,b = int(stru), int(strv), int(stra), int(strb)
-            aristas.append(((u,v),(a,b)))
+        stru , strv , stra , strb  = line.split()
+        u,v,a,b = int(stru), int(strv), int(stra), int(strb)
+        aristas.append(((u,v),(a,b)))
+
     grafo : UndirectedGraph[Vertex]  = UndirectedGraph(E=aristas)
-    return calorias_x, calorias_y, rows, cols,grafo
+    return (calorias_x, calorias_y, rows, cols,grafo)
 
 # - Recibe un objeto de tipo Data con la instancia del problema.
 # - Devuelve el resultado como un objeto de tipo Result.
 def process(data: Data) -> Result:
+
     calorias_x, calorias_y, rows, cols,grafo = data
 
     #obtener la habitacion del tesoro
     tesoro_room : Vertex = habitacion_tesoro(grafo, (0,0))
+
     #ir a la habitacion del tesoro
     camino = traverse_bf(grafo, (0,0),tesoro_room)
     pasossintesoro , pathtesoro = reconstructor(camino,tesoro_room)
+
     #me voy a la  salida con el tesoro
     camino = traverse_bf(grafo, tesoro_room,(rows-1,cols-1))
     pasoscontesoro , pathcontesoro = reconstructor(camino,(rows-1,cols-1))
 
     #preparo los resultados
-    caloria = cal_calorias(calorias_x, calorias_y,pasossintesoro,pasoscontesoro)
-    return ((rows, cols),caloria ,pathtesoro,pathcontesoro)
+    caloria = cal_calorias(calorias_x,calorias_y,pasossintesoro,pasoscontesoro)
+
+    return tesoro_room,caloria ,pathtesoro,pathcontesoro
 
 # - Recibe un objeto de tipo Result con el resultado del problema.
 # - Muestra la salida en el formato que se indica en el apartado 1.3 del enunciado
@@ -152,18 +161,7 @@ def habitacion_tesoro(graph: UndirectedGraph[Vertex],inicio : Vertex)-> Vertex:
 #Esta funcion coje 2 vertices distintos y te compara si si te has movido
 #en el eje x o en y en funcion de eso te devolvera un numero que sera
 #lo que has consumido
-def cal_calorias(u: Vertex,v : Vertex ,cal_x , cal_y) -> int:
-    a, b = u
-    c, d = v
-    if a == c:
-        # te has movido en el eje Y
-        return cal_y
-    else :
-        # te has movido en el eje X
-        return  cal_x
 
-
-    return 0
 # --- Programa principal ---
 
 
